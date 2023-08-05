@@ -13,17 +13,21 @@
         android:theme="@style/Theme.DonationsApp"
         tools:targetApi="31">
         <activity
+            android:name=".NewReceiversPost"
+            android:exported="false" />
+        <activity
+            android:name=".NewDonationsPost"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="false"
             android:label="@string/title_activity_main"
             android:theme="@style/Theme.DonationsApp.NoActionBar" />
-
         <activity
             android:name=".SignUp"
             android:exported="false"
             android:label="@string/title_activity_signup"
             android:theme="@style/Theme.DonationsApp.NoActionBar" />
-
         <activity
             android:name=".LogIn"
             android:exported="true">

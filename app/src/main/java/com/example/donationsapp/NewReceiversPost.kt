@@ -1,17 +1,14 @@
-package com.example.donationsapp.ui.post
+package com.example.donationsapp
 
-import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.net.Uri
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.fragment.app.Fragment
+import com.example.donationsapp.databinding.ActivityNewReceiversPostBinding
 import com.example.donationsapp.datasource.DataClassDonation
-import com.example.donationsapp.databinding.FragmentPostBinding
 import com.example.donationsapp.datasource.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -23,25 +20,24 @@ import com.google.firebase.storage.FirebaseStorage
 import java.text.DateFormat
 import java.util.Calendar
 
-class PostFragment : Fragment() {
+class NewReceiversPost : AppCompatActivity() {
 
-    private var _binding: FragmentPostBinding? = null
+    private lateinit var binding: ActivityNewReceiversPostBinding
     var imageURL: String? = null
     private var uri: Uri? = null
     private lateinit var user: User
     private lateinit var databaseReference: DatabaseReference
     private lateinit var firebaseAuth: FirebaseAuth
 
-    private val binding get() = _binding!!
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+        binding = ActivityNewReceiversPostBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        _binding = FragmentPostBinding.inflate(inflater, container, false)
-        val root: View = binding.root
+        binding.backButton.setOnClickListener {
+            finish()
+        }
 
         val activityResultLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
@@ -51,7 +47,7 @@ class PostFragment : Fragment() {
                 uri = data!!.data
                 binding.uploadImage.setImageURI(uri)
             } else {
-                Toast.makeText(requireContext(), "No Image Selected", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "No Image Selected", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -63,13 +59,13 @@ class PostFragment : Fragment() {
         binding.uploadButton.setOnClickListener {
             binding.progressBar.visibility = View.VISIBLE
             saveData()
+            finish()
         }
 
-        return root
     }
 
     private fun saveData() {
-        val storageReference = FirebaseStorage.getInstance().reference.child("Post Images")
+        val storageReference = FirebaseStorage.getInstance().reference.child("Receivers Post Images")
             .child(uri!!.lastPathSegment!!)
         storageReference.putFile(uri!!).addOnSuccessListener { taskSnapshot ->
             val uriTask = taskSnapshot.storage.downloadUrl
@@ -79,27 +75,25 @@ class PostFragment : Fragment() {
             uploadData()
         }.addOnFailureListener {
             Toast.makeText(
-                requireContext(), "save data failed", Toast.LENGTH_SHORT
+                this, "save data failed", Toast.LENGTH_SHORT
             ).show()
         }
     }
 
     private fun uploadData() {
         val caption = binding.postCaption.text.toString()
-        val title  = binding.postTitle.text.toString()
+        val title = binding.postTitle.text.toString()
         val type = if (binding.foodPost.isChecked) {
             "Food"
-        } else if(binding.clothingPost.isChecked) {
+        } else if (binding.clothingPost.isChecked) {
             "Clothing"
-        } else if(binding.housewarePost.isChecked){
+        } else if (binding.housewarePost.isChecked) {
             "Houseware"
-        }
-        else if(binding.volunteeringPost.isChecked){
+        } else if (binding.volunteeringPost.isChecked) {
             "Volunteering"
-        }else if(binding.techPost.isChecked){
+        } else if (binding.techPost.isChecked) {
             "Technology"
-        }
-        else {
+        } else {
             "Miscellaneous"
         }
 
@@ -113,24 +107,30 @@ class PostFragment : Fragment() {
                 ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     user = snapshot.getValue(User::class.java)!!
-                    val dataClass = DataClassDonation(title, type, caption, user.organization, imageURL)
-                    FirebaseDatabase.getInstance().getReference("Posts").child(currentDate)
+                    val dataClass =
+                        DataClassDonation(title, type, caption, user.organization, imageURL)
+                    FirebaseDatabase.getInstance().getReference("Receivers Posts").child(currentDate)
                         .setValue(dataClass).addOnCompleteListener { task ->
                             if (task.isSuccessful) {
-                                Toast.makeText(requireContext(), "Uploaded Successfully!", Toast.LENGTH_SHORT)
+                                Toast.makeText(
+                                    this@NewReceiversPost,
+                                    "Uploaded Successfully!",
+                                    Toast.LENGTH_SHORT
+                                )
                                     .show()
                                 binding.postCaption.setText("")
                                 binding.progressBar.visibility = View.GONE
                             }
                         }.addOnFailureListener {
                             Toast.makeText(
-                                requireContext(), "upload data failed", Toast.LENGTH_SHORT
+                                this@NewReceiversPost, "upload data failed", Toast.LENGTH_SHORT
                             ).show()
                         }
                 }
+
                 override fun onCancelled(error: DatabaseError) {
                     Toast.makeText(
-                        requireContext(),
+                        this@NewReceiversPost,
                         "Failed!",
                         Toast.LENGTH_SHORT
                     ).show()
@@ -139,10 +139,4 @@ class PostFragment : Fragment() {
             })
         }
     }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
 }

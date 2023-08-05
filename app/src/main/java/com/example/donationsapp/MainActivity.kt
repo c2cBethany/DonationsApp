@@ -40,10 +40,6 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.appBarMain.toolbar)
 
-        binding.appBarMain.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-        }
         val navView: NavigationView = binding.navView
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val headerView: View = navView.getHeaderView(0)
@@ -89,7 +85,6 @@ class MainActivity : AppCompatActivity() {
             setOf(
                 R.id.nav_home,
                 R.id.nav_receivers,
-                R.id.nav_post,
                 R.id.nav_donations,
                 R.id.nav_profile,
                 R.id.nav_logout

@@ -1,6 +1,7 @@
 package com.example.donationsapp.ui.donations
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,7 @@ import android.widget.SearchView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.donationsapp.NewDonationsPost
 import com.example.donationsapp.datasource.DataClassDonation
 import com.example.donationsapp.adaptors.ImagesAdapter
 import com.example.donationsapp.databinding.FragmentDonationsBinding
@@ -38,6 +40,11 @@ class DonationsFragment : Fragment() {
         _binding = FragmentDonationsBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+        binding.fabDonationsPost.setOnClickListener {
+            val intent = Intent(activity, NewDonationsPost::class.java)
+            startActivity(intent)
+        }
+
         val gridLayoutManager = GridLayoutManager(requireContext(), 1)
         binding.recyclerView.layoutManager = gridLayoutManager
 
@@ -45,7 +52,7 @@ class DonationsFragment : Fragment() {
         dataList = ArrayList()
         adapter = ImagesAdapter(requireContext(), dataList)
         binding.recyclerView.adapter = adapter
-        databaseReference = FirebaseDatabase.getInstance().getReference("Posts")
+        databaseReference = FirebaseDatabase.getInstance().getReference("Donation Posts")
         binding.progressBar.visibility = View.GONE
 
         eventListener = databaseReference!!.addValueEventListener(object : ValueEventListener {
